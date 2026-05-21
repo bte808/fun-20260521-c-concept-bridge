@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Concept Bridge turns study notes into a concept map, recall prompts, and exportable review material.">
+    <title>Concept Bridge</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Local academic helper</p>
+        <h1>Concept Bridge</h1>
+      </div>
+      <div class="toolbar" aria-label="Workspace actions">
+        <button id="demo-button" type="button">Demo</button>
+        <button id="clear-button" type="button">Clear</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="input-pane" aria-labelledby="input-heading">
+        <div class="section-heading">
+          <h2 id="input-heading">Source Notes</h2>
+          <p>Use course notes, paper notes, or lab notes you are allowed to process locally.</p>
+        </div>
+        <label for="title-input">Review title</label>
+        <input id="title-input" type="text" autocomplete="off">
+        <label for="notes-input">Notes</label>
+        <textarea id="notes-input" spellcheck="true"></textarea>
+        <div class="action-row">
+          <button id="analyze-button" class="primary" type="button">Analyze Notes</button>
+          <button id="copy-markdown" type="button">Copy Markdown</button>
+          <button id="download-json" type="button">Export JSON</button>
+          <button id="download-svg" type="button">Export SVG</button>
+        </div>
+        <p id="status-line" class="status" aria-live="polite"></p>
+      </section>
+
+      <section class="map-pane" aria-labelledby="map-heading">
+        <div class="section-heading">
+          <h2 id="map-heading">Concept Map</h2>
+          <p>Heuristic links stay tied to source sentences for checking.</p>
+        </div>
+        <div id="map-canvas" class="map-canvas"></div>
+        <div id="empty-state" class="empty-state">No map yet</div>
+      </section>
+
+      <section class="output-grid" aria-label="Review output">
+        <article class="panel">
+          <h2>Concepts</h2>
+          <ol id="concept-list" class="stack-list"></ol>
+        </article>
+        <article class="panel">
+          <h2>Relationships</h2>
+          <ol id="relation-list" class="stack-list"></ol>
+        </article>
+        <article class="panel">
+          <h2>Recall Prompts</h2>
+          <ol id="prompt-list" class="stack-list"></ol>
+        </article>
+        <article class="panel">
+          <h2>Gap Check</h2>
+          <ul id="gap-list" class="gap-list"></ul>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <p>Concept Bridge is a local heuristic assistant. It does not cite papers, infer truth, or replace source reading.</p>
+    </footer>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

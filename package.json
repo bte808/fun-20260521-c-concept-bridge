@@ -1,0 +1,20 @@
+{
+  "name": "fun-20260521-c-concept-bridge",
+  "version": "1.0.0",
+  "description": "A local study-notes tool that turns rough notes into a concept map, recall prompts, and exportable review material.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 5174",
+    "check": "node --check src/concept-engine.js && node --check src/app.js",
+    "test": "node ./test/concept-engine.test.mjs"
+  },
+  "keywords": [
+    "study-tool",
+    "concept-map",
+    "notes",
+    "academic",
+    "static-web"
+  ],
+  "author": "",
+  "license": "MIT"
+}
