@@ -6,6 +6,7 @@ const analyzeButton = document.querySelector("#analyze-button");
 const demoButton = document.querySelector("#demo-button");
 const clearButton = document.querySelector("#clear-button");
 const copyMarkdownButton = document.querySelector("#copy-markdown");
+const downloadMarkdownButton = document.querySelector("#download-markdown");
 const downloadJsonButton = document.querySelector("#download-json");
 const downloadSvgButton = document.querySelector("#download-svg");
 const statusLine = document.querySelector("#status-line");
@@ -210,13 +211,45 @@ function download(filename, content, type) {
   URL.revokeObjectURL(url);
 }
 
+function filenameFromTitle(title, fallback) {
+  const slug = title
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+
+  return slug || fallback;
+}
+
+function buildMarkdown() {
+  return toMarkdown(currentAnalysis, titleInput.value.trim() || "Concept Bridge Review");
+}
+
 async function copyMarkdown() {
   if (!ensureAnalysis()) {
     return;
   }
-  const markdown = toMarkdown(currentAnalysis, titleInput.value.trim() || "Concept Bridge Review");
-  await navigator.clipboard.writeText(markdown);
-  setStatus("Markdown copied. Keep source checks attached when you reuse it.");
+  const markdown = buildMarkdown();
+
+  try {
+    await navigator.clipboard.writeText(markdown);
+    setStatus("Markdown copied. Keep source checks attached when you reuse it.");
+  } catch (error) {
+    console.warn("Clipboard copy was blocked; downloading Markdown instead.", error);
+    const filename = `${filenameFromTitle(titleInput.value.trim(), "concept-bridge-review")}.md`;
+    download(filename, markdown, "text/markdown");
+    setStatus("Clipboard was blocked, so Markdown downloaded instead.");
+  }
+}
+
+function downloadMarkdown() {
+  if (!ensureAnalysis()) {
+    return;
+  }
+  const filename = `${filenameFromTitle(titleInput.value.trim(), "concept-bridge-review")}.md`;
+  download(filename, buildMarkdown(), "text/markdown");
+  setStatus("Markdown file downloaded.");
 }
 
 function downloadJson() {
@@ -263,6 +296,7 @@ analyzeButton.addEventListener("click", runAnalysis);
 demoButton.addEventListener("click", resetToDemo);
 clearButton.addEventListener("click", clearWorkspace);
 copyMarkdownButton.addEventListener("click", copyMarkdown);
+downloadMarkdownButton.addEventListener("click", downloadMarkdown);
 downloadJsonButton.addEventListener("click", downloadJson);
 downloadSvgButton.addEventListener("click", downloadSvg);
 

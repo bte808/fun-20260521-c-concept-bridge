@@ -68,6 +68,7 @@ npm test
 - Active-recall prompt generation.
 - Gap warnings for thin notes, sparse links, or isolated concepts.
 - Copy-to-clipboard Markdown export.
+- Markdown file download when clipboard access is blocked.
 - JSON and SVG downloads.
 - Responsive layout for desktop and mobile screens.
 
