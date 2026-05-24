@@ -323,3 +323,21 @@ export function toMarkdown(analysis, title = "Concept Bridge Review") {
 
   return lines.join("\n");
 }
+
+function csvCell(value) {
+  const cell = String(value ?? "");
+  if (/[",\n\r]/.test(cell)) {
+    return `"${cell.replace(/"/g, '""')}"`;
+  }
+  return cell;
+}
+
+export function toFlashcardCsv(analysis) {
+  const rows = [["Front", "Back", "Type"]];
+
+  analysis.prompts.forEach((item) => {
+    rows.push([item.prompt, item.check, item.type]);
+  });
+
+  return rows.map((row) => row.map(csvCell).join(",")).join("\n");
+}

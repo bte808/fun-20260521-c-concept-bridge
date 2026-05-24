@@ -1,4 +1,4 @@
-import { DEMO_NOTES, analyzeNotes, toMarkdown } from "./concept-engine.js";
+import { DEMO_NOTES, analyzeNotes, toFlashcardCsv, toMarkdown } from "./concept-engine.js";
 
 const notesInput = document.querySelector("#notes-input");
 const titleInput = document.querySelector("#title-input");
@@ -7,6 +7,7 @@ const demoButton = document.querySelector("#demo-button");
 const clearButton = document.querySelector("#clear-button");
 const copyMarkdownButton = document.querySelector("#copy-markdown");
 const downloadMarkdownButton = document.querySelector("#download-markdown");
+const downloadCsvButton = document.querySelector("#download-csv");
 const downloadJsonButton = document.querySelector("#download-json");
 const downloadSvgButton = document.querySelector("#download-svg");
 const statusLine = document.querySelector("#status-line");
@@ -260,6 +261,15 @@ function downloadJson() {
   setStatus("JSON exported.");
 }
 
+function downloadCsv() {
+  if (!ensureAnalysis()) {
+    return;
+  }
+  const filename = `${filenameFromTitle(titleInput.value.trim(), "concept-bridge-review")}-flashcards.csv`;
+  download(filename, toFlashcardCsv(currentAnalysis), "text/csv");
+  setStatus("Flashcard CSV exported.");
+}
+
 function downloadSvg() {
   if (!ensureAnalysis()) {
     return;
@@ -297,6 +307,7 @@ demoButton.addEventListener("click", resetToDemo);
 clearButton.addEventListener("click", clearWorkspace);
 copyMarkdownButton.addEventListener("click", copyMarkdown);
 downloadMarkdownButton.addEventListener("click", downloadMarkdown);
+downloadCsvButton.addEventListener("click", downloadCsv);
 downloadJsonButton.addEventListener("click", downloadJson);
 downloadSvgButton.addEventListener("click", downloadSvg);
 

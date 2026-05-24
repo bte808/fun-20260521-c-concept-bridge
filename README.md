@@ -69,13 +69,13 @@ npm test
 - Gap warnings for thin notes, sparse links, or isolated concepts.
 - Copy-to-clipboard Markdown export.
 - Markdown file download when clipboard access is blocked.
+- CSV flashcard export for recall prompts.
 - JSON and SVG downloads.
 - Responsive layout for desktop and mobile screens.
 
 ## Future Extensions
 
 - Manual concept pinning and relation editing.
-- CSV export for flashcard apps.
 - Better multilingual tokenization.
 - Optional import from Markdown headings.
 - Side-by-side source sentence highlighting.

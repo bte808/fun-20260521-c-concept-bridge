@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { DEMO_NOTES, analyzeNotes, splitSentences, toMarkdown } from "../src/concept-engine.js";
+import { DEMO_NOTES, analyzeNotes, splitSentences, toFlashcardCsv, toMarkdown } from "../src/concept-engine.js";
 
 const sentences = splitSentences(DEMO_NOTES);
 assert.ok(sentences.length >= 5, "demo should provide enough source sentences");
@@ -30,5 +30,21 @@ const markdown = toMarkdown(analysis, "Demo Review");
 assert.match(markdown, /^# Demo Review/);
 assert.match(markdown, /Local heuristic output/);
 assert.match(markdown, /## Recall Prompts/);
+
+const csv = toFlashcardCsv(analysis);
+assert.match(csv, /^Front,Back,Type/);
+assert.match(csv, /Define|Explain/);
+
+const escapedCsv = toFlashcardCsv({
+  prompts: [
+    {
+      type: "link",
+      prompt: 'Explain "Alpha, Beta"',
+      check: "Line one\nLine two"
+    }
+  ]
+});
+assert.match(escapedCsv, /"Explain ""Alpha, Beta"""/);
+assert.match(escapedCsv, /"Line one\nLine two"/);
 
 console.log("Concept engine checks passed.");
