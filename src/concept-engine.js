@@ -129,6 +129,10 @@ export function splitSentences(text) {
     .filter((sentence) => sentence.length > 18);
 }
 
+export function sourceRef(index) {
+  return Number.isInteger(index) && index >= 0 ? `S${index + 1}` : "Source";
+}
+
 function tokenize(sentence) {
   return sentence
     .toLowerCase()
@@ -154,6 +158,7 @@ function scorePhrase(words, sentenceIndex) {
 export function extractConcepts(sentences, limit = 9) {
   const scores = new Map();
   const evidence = new Map();
+  const evidenceIndex = new Map();
 
   sentences.forEach((sentence, sentenceIndex) => {
     const words = tokenize(sentence).filter((word) => !STOP_WORDS.has(word));
@@ -173,6 +178,7 @@ export function extractConcepts(sentences, limit = 9) {
         scores.set(key, (scores.get(key) || 0) + scorePhrase(grams, sentenceIndex));
         if (!evidence.has(key)) {
           evidence.set(key, sentence);
+          evidenceIndex.set(key, sentenceIndex);
         }
       }
     }
@@ -188,7 +194,8 @@ export function extractConcepts(sentences, limit = 9) {
     term: titleCase(phrase),
     key: phrase,
     score: Number(score.toFixed(2)),
-    evidence: evidence.get(phrase)
+    evidence: evidence.get(phrase),
+    evidenceIndex: evidenceIndex.get(phrase)
   }));
 }
 
@@ -206,7 +213,7 @@ function detectRelationLabel(sentence) {
 export function buildRelations(sentences, concepts, limit = 10) {
   const relationMap = new Map();
 
-  sentences.forEach((sentence) => {
+  sentences.forEach((sentence, sentenceIndex) => {
     const present = concepts.filter((concept) => sentenceContains(sentence, concept));
     for (let i = 0; i < present.length; i += 1) {
       for (let j = i + 1; j < present.length; j += 1) {
@@ -220,7 +227,8 @@ export function buildRelations(sentences, concepts, limit = 10) {
             sourceTerm: source.term,
             targetTerm: target.term,
             label: detectRelationLabel(sentence),
-            evidence: sentence
+            evidence: sentence,
+            evidenceIndex: sentenceIndex
           });
         }
       }
@@ -234,13 +242,15 @@ export function makeRecallPrompts(concepts, relations) {
   const relationPrompts = relations.slice(0, 4).map((relation) => ({
     type: "link",
     prompt: `Explain why "${relation.sourceTerm}" ${relation.label} "${relation.targetTerm}".`,
-    check: relation.evidence
+    check: relation.evidence,
+    sourceRef: sourceRef(relation.evidenceIndex)
   }));
 
   const conceptPrompts = concepts.slice(0, Math.max(0, 6 - relationPrompts.length)).map((concept) => ({
     type: "concept",
     prompt: `Define "${concept.term}" from memory, then compare your answer with the source sentence.`,
-    check: concept.evidence
+    check: concept.evidence,
+    sourceRef: sourceRef(concept.evidenceIndex)
   }));
 
   return [...relationPrompts, ...conceptPrompts];
@@ -273,10 +283,15 @@ export function analyzeNotes(text, options = {}) {
   const relations = buildRelations(sentences, concepts, options.relationLimit || 10);
   const prompts = makeRecallPrompts(concepts, relations);
   const gaps = assessGaps(sentences, concepts, relations);
+  const sourceSentences = sentences.map((sentence, index) => ({
+    id: sourceRef(index),
+    text: sentence
+  }));
 
   return {
     sourceLength: normalizeText(text).length,
     sentenceCount: sentences.length,
+    sourceSentences,
     concepts,
     relations,
     prompts,
@@ -295,7 +310,7 @@ export function toMarkdown(analysis, title = "Concept Bridge Review") {
   ];
 
   analysis.concepts.forEach((concept) => {
-    lines.push(`- **${concept.term}**: ${concept.evidence}`);
+    lines.push(`- **${concept.term}** (${sourceRef(concept.evidenceIndex)}): ${concept.evidence}`);
   });
 
   lines.push("", "## Relationships");
@@ -304,14 +319,14 @@ export function toMarkdown(analysis, title = "Concept Bridge Review") {
   } else {
     analysis.relations.forEach((relation) => {
       lines.push(`- **${relation.sourceTerm}** ${relation.label} **${relation.targetTerm}**`);
-      lines.push(`  - Source sentence: ${relation.evidence}`);
+      lines.push(`  - ${sourceRef(relation.evidenceIndex)}: ${relation.evidence}`);
     });
   }
 
   lines.push("", "## Recall Prompts");
   analysis.prompts.forEach((item, index) => {
     lines.push(`${index + 1}. ${item.prompt}`);
-    lines.push(`   - Check against: ${item.check}`);
+    lines.push(`   - Check against ${item.sourceRef || "the source sentence"}: ${item.check}`);
   });
 
   lines.push("", "## Gap Check");
@@ -319,6 +334,13 @@ export function toMarkdown(analysis, title = "Concept Bridge Review") {
     lines.push("- No obvious structural gaps detected by the heuristic.");
   } else {
     analysis.gaps.forEach((gap) => lines.push(`- ${gap}`));
+  }
+
+  if (analysis.sourceSentences?.length) {
+    lines.push("", "## Source Sentences");
+    analysis.sourceSentences.forEach((sentence) => {
+      lines.push(`- **${sentence.id}**: ${sentence.text}`);
+    });
   }
 
   return lines.join("\n");

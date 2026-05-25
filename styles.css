@@ -244,9 +244,13 @@ textarea {
   color: var(--muted);
 }
 
+.empty-state[hidden] {
+  display: none;
+}
+
 .output-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 18px;
   grid-column: 1 / -1;
 }
@@ -290,9 +294,27 @@ textarea {
   font-weight: 750;
 }
 
+.source-badge,
+.concept-item .source-badge,
+.relation-line .source-badge,
+.prompt-item .source-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  background: #eef8f5;
+  color: var(--accent-dark);
+  padding: 0 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .concept-item p,
 .relation-item p,
-.prompt-item p {
+.prompt-item p,
+.source-item p {
   margin: 8px 0 0;
   color: var(--muted);
   font-size: 0.88rem;
@@ -321,6 +343,25 @@ textarea {
   line-height: 1.42;
 }
 
+.source-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 12px;
+}
+
+.source-item strong {
+  color: var(--accent-dark);
+}
+
 .muted-row {
   color: var(--muted);
 }
@@ -339,10 +380,6 @@ footer {
   .input-pane,
   .map-pane {
     min-height: 0;
-  }
-
-  .output-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

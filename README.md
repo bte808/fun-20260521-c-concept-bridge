@@ -9,6 +9,7 @@ It is built for one focused workflow:
 3. Copy Markdown or export JSON/SVG for a study deck, research journal, or class review sheet.
 
 The tool runs fully in the browser. It does not call an AI service, cite papers, or infer truth. Every generated concept and relationship keeps a source sentence so you can verify it against the original material.
+Source labels such as `S1` and `S2` now appear in the UI and Markdown export, so every concept, link, and recall prompt can be traced back to the exact source sentence ledger.
 
 ## Why This Is Useful
 
@@ -64,6 +65,7 @@ npm test
 - Default demo note that works on first load.
 - Heuristic concept extraction from pasted notes.
 - Relationship detection with source sentences attached.
+- Source sentence ledger with `S1`/`S2` labels in the UI and Markdown export.
 - SVG concept map preview.
 - Active-recall prompt generation.
 - Gap warnings for thin notes, sparse links, or isolated concepts.

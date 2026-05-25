@@ -1,4 +1,4 @@
-import { DEMO_NOTES, analyzeNotes, toFlashcardCsv, toMarkdown } from "./concept-engine.js";
+import { DEMO_NOTES, analyzeNotes, sourceRef, toFlashcardCsv, toMarkdown } from "./concept-engine.js";
 
 const notesInput = document.querySelector("#notes-input");
 const titleInput = document.querySelector("#title-input");
@@ -15,6 +15,7 @@ const conceptList = document.querySelector("#concept-list");
 const relationList = document.querySelector("#relation-list");
 const promptList = document.querySelector("#prompt-list");
 const gapList = document.querySelector("#gap-list");
+const sourceList = document.querySelector("#source-list");
 const mapCanvas = document.querySelector("#map-canvas");
 const emptyState = document.querySelector("#empty-state");
 
@@ -61,6 +62,7 @@ function renderConcepts(analysis) {
       <div>
         <strong>${escapeHtml(concept.term)}</strong>
         <span>score ${concept.score}</span>
+        <span class="source-badge">${sourceRef(concept.evidenceIndex)}</span>
       </div>
       <p>${escapeHtml(concept.evidence)}</p>
     `;
@@ -83,6 +85,7 @@ function renderRelations(analysis) {
         <strong>${escapeHtml(relation.sourceTerm)}</strong>
         <span>${escapeHtml(relation.label)}</span>
         <strong>${escapeHtml(relation.targetTerm)}</strong>
+        <span class="source-badge">${sourceRef(relation.evidenceIndex)}</span>
       </div>
       <p>${escapeHtml(relation.evidence)}</p>
     `;
@@ -99,6 +102,7 @@ function renderPrompts(analysis) {
       <span>${index + 1}</span>
       <div>
         <strong>${escapeHtml(item.prompt)}</strong>
+        <span class="source-badge">${escapeHtml(item.sourceRef || "Source")}</span>
         <p>${escapeHtml(item.check)}</p>
       </div>
     `;
@@ -113,6 +117,19 @@ function renderGaps(analysis) {
     const item = document.createElement("li");
     item.textContent = gap;
     gapList.appendChild(item);
+  });
+}
+
+function renderSources(analysis) {
+  sourceList.innerHTML = "";
+  analysis.sourceSentences.forEach((sentence) => {
+    const item = document.createElement("li");
+    item.className = "source-item";
+    item.innerHTML = `
+      <strong>${escapeHtml(sentence.id)}</strong>
+      <p>${escapeHtml(sentence.text)}</p>
+    `;
+    sourceList.appendChild(item);
   });
 }
 
@@ -178,6 +195,7 @@ function renderAll(analysis) {
   renderRelations(analysis);
   renderPrompts(analysis);
   renderGaps(analysis);
+  renderSources(analysis);
   renderMap(analysis);
   setStatus(`${analysis.sentenceCount} source sentences, ${analysis.concepts.length} concepts, ${analysis.relations.length} links.`);
 }
@@ -296,6 +314,7 @@ function clearWorkspace() {
   relationList.innerHTML = "";
   promptList.innerHTML = "";
   gapList.innerHTML = "";
+  sourceList.innerHTML = "";
   mapCanvas.innerHTML = "";
   emptyState.hidden = false;
   setStatus("Workspace cleared.");
