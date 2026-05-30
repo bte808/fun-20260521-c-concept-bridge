@@ -42,19 +42,22 @@ assert.match(markdown, /## Source Sentences/);
 assert.match(markdown, /\(S\d+\)/);
 
 const csv = toFlashcardCsv(analysis);
-assert.match(csv, /^Front,Back,Type/);
+assert.match(csv, /^Front,Back,Type,Source/);
 assert.match(csv, /Define|Explain/);
+assert.match(csv, /,S\d+/);
 
 const escapedCsv = toFlashcardCsv({
   prompts: [
     {
       type: "link",
       prompt: 'Explain "Alpha, Beta"',
-      check: "Line one\nLine two"
+      check: "Line one\nLine two",
+      sourceRef: "S7"
     }
   ]
 });
 assert.match(escapedCsv, /"Explain ""Alpha, Beta"""/);
 assert.match(escapedCsv, /"Line one\nLine two"/);
+assert.match(escapedCsv, /,S7/);
 
 console.log("Concept engine checks passed.");

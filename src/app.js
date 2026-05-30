@@ -285,7 +285,7 @@ function downloadCsv() {
   }
   const filename = `${filenameFromTitle(titleInput.value.trim(), "concept-bridge-review")}-flashcards.csv`;
   download(filename, toFlashcardCsv(currentAnalysis), "text/csv");
-  setStatus("Flashcard CSV exported.");
+  setStatus("Flashcard CSV exported with source refs.");
 }
 
 function downloadSvg() {

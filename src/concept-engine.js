@@ -355,10 +355,10 @@ function csvCell(value) {
 }
 
 export function toFlashcardCsv(analysis) {
-  const rows = [["Front", "Back", "Type"]];
+  const rows = [["Front", "Back", "Type", "Source"]];
 
   analysis.prompts.forEach((item) => {
-    rows.push([item.prompt, item.check, item.type]);
+    rows.push([item.prompt, item.check, item.type, item.sourceRef || "Source"]);
   });
 
   return rows.map((row) => row.map(csvCell).join(",")).join("\n");
